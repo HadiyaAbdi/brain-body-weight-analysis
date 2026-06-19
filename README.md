@@ -27,3 +27,6 @@ This project investigates how mammalian body weight relates to brain weight usin
 ## Skills
 
 R • tidyverse • ggplot2 • Linear Regression • Statistical Modeling
+
+## Data:
+This analysis uses a publicly reported mammalian brain and body weight dataset compiled from published studies. The dataset is not redistributed in this repository. Please obtain the data from the original source or your course materials before running the analysis.
