@@ -1,0 +1,240 @@
+---
+title: "Case_Study"
+format:
+  html:
+    code-fold: true
+    code-summary: "Show code"
+author: Hadiya Cabdi
+editor: source
+bibliography: refrences.bib
+---
+
+# Beastly Bodies and Brains 
+
+## Intro:
+
+In this case study we will be addressing whether size/body weight have an effect on Brain size while also recognizing the fact that size isn't relevant to how smart an animal is. The research will be surrounded on answering - What the relationship between body size and Brain size is while using the animal kingdom data. The data was aggregated by Tartarelli and Bisconti from several studies and was reported as a data set of body sizes(KG) and brain weight(g) for 70 mammalian species[@tartarelli2006]. These data would be answering the main research question by examining two sub research questions, which are: 
+
+## Research questions:
+
+-   What is a plausible range of values for the coefficient that relates change in body weight to a corresponding change in brain weight?
+-   Should humans be considered an outlier of the general brain vs. body weight relationship? 
+
+## Hypothesis:
+
+- Null hypothesis = H0 = B1 = 0(There is no linear relationship between body weight and brain weight)
+- Alternative hypothesis:( There is a linear relationship between body wight and brain weight)
+
+## Process:
+
+Initially will have to run our data and library functions as seen below:
+
+```{r}
+#| message: false         
+#| warning: false         
+#| error: false  
+         
+library(tidyverse)
+library(performance)
+library(see)
+Brain_Body_weight <- read_csv("Mammal Brain and Body Weight - body_brain.csv")
+```
+
+In order to avoid computational errors due to the data we will have to first perform data wrangling steps and identify observations with missing values.
+
+```{r}
+#| message: false         
+#| warning: false         
+#| error: false  
+Brain_Body_weight[Brain_Body_weight$Body_weight_kg == 0, ]
+Brain_Body_weight[Brain_Body_weight$Brain_weight_g == 0, ]
+```
+
+This helps us identify any zero or missing values in our two numeric columns, Body_weight_kg and Brain_weight_g of each mammal in column Species. We will pass all the variables with body weight and brain weight greater than 0 to our new variable Brain_body_weight_clean. This will exclude anything with 0 or negative numbers.
+
+```{r}
+#| message: false         
+#| warning: false         
+#| error: false  
+
+Brain_Body_weight_clean <- subset(Brain_Body_weight,
+                                   Body_weight_kg > 0 &
+                                   Brain_weight_g > 0)
+```
+
+### What is a plausible range of values for the coefficient that relates change in body weight to a corresponding change in brain weight?
+
+```{r}
+#| message: false         
+#| warning: false         
+#| error: false  
+model <- lm(Brain_weight_g ~ Body_weight_kg, data = Brain_Body_weight_clean)
+summary(model)
+```
+
+- The summary table shows that our relevant explanatory variable (b1) is represented as Body_weight_kg in the summary table with an estimate of 0.07161, which is our slope aswell. Our intercept is 465g Brain weight when Body weight is 0. This slope shows that for every 1kg increase in a mammal's body weight, the corresponding increase in brain weight increases by 0.07161. 
+
+- This is a very small number indicating that the mammal's brain weight grows slower than body weight. This can be shown through plugging it in the linear equation :
+$$
+Y = b_0 + b_1 \cdot \text{Body\_weight\_Kg}
+$$
+
+$$
+Y = 465.89 + 0.072 \cdot \text{Body\_weight\_Kg}
+$$
+
+- If pvalue is less then alpha(0.05) we get to reject the null hypothesis. The summary table shows that our pvalue is $$1.35e^{-0.8}$$, compared to our alpha (0.05) $$1.35e^{-0.8} > 0.05 $$  The p-value is greater thus we will reject the null hypothesis. 
+
+```{r}
+#| message: false         
+#| warning: false         
+#| error: false  
+confint(model)
+```
+
+Based on this data the plausible range of values for the coefficient Body_weight_kg for each 1kg increase in 95% Confidence interval indicates that brain weight is between 0.0495g and 0.0937g. 
+
+- However we will have to check if it meets linearity rules by visualizing it:
+
+```{r}
+#| message: false         
+#| warning: false         
+#| error: false  
+library(ggplot2)
+ggplot(data = Brain_Body_weight_clean,
+       mapping = aes(x = Body_weight_kg, y = Brain_weight_g)) + 
+  geom_point() +
+  geom_smooth(method = lm, formula = y ~x)
+```
+
+Looking at this graph we see that we cant infer a good linear relationship between body weight and brain weight, and we can further check that by looking at the simple linear equation rules such as linearity check, and variance check.
+
+```{r}
+#| message: false         
+#| warning: false         
+#| error: false  
+
+check_all <- check_model(model, check = c("linearity", "qq", "homogeneity"), panel = FALSE)
+attr(check_all, "show_ci") <- FALSE
+plot(check_all)
+
+```
+
+Both Linearity check and variance check have a reference line that isn't flat and horizontal, so we will refer to using log log to show a better model fit and make the relationship linear and stabilize the variance.
+
+```{r}
+#| message: false         
+#| warning: false         
+#| error: false  
+
+model_log <- lm(log(Brain_weight_g) ~ log(Body_weight_kg),
+                data = Brain_Body_weight_clean)
+summary(model_log)
+```
+
+```{r}
+#| message: false         
+#| warning: false         
+#| error: false  
+
+library(ggplot2)
+
+ggplot(data = Brain_Body_weight_clean,
+       mapping = aes(x = log(Body_weight_kg), y = log(Brain_weight_g))) + 
+  geom_point() +
+  geom_smooth(method = lm, formula = y ~x)
+```
+
+```{r}
+#| message: false         
+#| warning: false         
+#| error: false  
+
+All_checks <- check_model(model_log, check = c("linearity", "qq", "homogeneity"), panel = FALSE)
+attr(All_checks, "show_ci") <- FALSE
+plot(All_checks)
+```
+
+This looks much better and we can see a positive trend/linear relationship in th first log log graph. The Linearity check graph isnt flat but looks much better then the true population linearity graph so is variance. QQ didn't change much.Now we can look for the range again through confint:
+
+```{r}
+#| message: false         
+#| warning: false         
+#| error: false  
+
+confint(model_log, level = 0.95)
+```
+## Results: 
+
+- Based on this log log regression module, the plausible range of values for the coefficient relating body weight to brain weight suggests that for a 1% increase in body weight, brain weight increases between (0.62% & 0.72%), with an estimated increase of approximately 0.67%.
+
+### Q2: Should humans be considered an outlier of the general brain vs. body weight relationship?
+
+We can find whether humans are outliers or not by modeling them with the rest of the mammals and see whether they stick out in a fitted graph.
+
+```{r}
+#| message: false         
+#| warning: false         
+#| error: false  
+
+library(ggplot2)
+
+ggplot(Brain_Body_weight_clean, aes(x = Body_weight_kg, y = Brain_weight_g)) +
+  geom_point(aes(color = Species == "Human"), size = 3) +
+  geom_smooth(method = "lm", se = FALSE, color = "pink") +
+  labs(x = "Body Weight (kg)", y = "Brain Weight (g)") +
+  scale_color_manual(values = c("black", "red"), labels = c("Other Mammals", "Human")) +
+  theme_minimal()
+```
+
+There is a scale issue with this graph since the line is being pulled upward by extremely large mammals which makes humans seem like they are not an outlier but to truly know whether they are an outlier or not we will have to compute a log log model which will compress the huge range of weights so we can see the difference better.
+
+```{r}
+#| message: false         
+#| warning: false         
+#| error: false  
+
+ggplot(Brain_Body_weight_clean, aes(x = log(Body_weight_kg), y = log(Brain_weight_g))) + 
+  geom_point(aes(color = Species == "Human"), size = 3) +
+  geom_smooth(method = "lm", se = FALSE, color = "green") +
+  scale_color_manual(values = c("black", "red"), labels = c("Other Mammals", "Human")) +
+  labs(x = "Log Body Weight (kg)", y = "Log Brain Weight (g)") +
+  theme_minimal()
+```
+Even after the log log someone can argue that humans dont deviate that much from the rest of the mammals. In order to further determine whether humans are outlier or not, we will have to perform a prediction interval analyses to find the usual and unusual range through a 95% Confidence Interval.
+
+```{r}
+#| message: false         
+#| warning: false         
+#| error: false  
+
+model_predict <- predict(model, newdata = data.frame(Body_weight_kg = 62),
+        interval = "prediction")
+head(model_predict)
+```
+
+## Results 2:
+
+- From the prediction interval we get that a brain weight is around 470.32g, and the predicted 95% Confidence interval is between the intervals(-2616.98g, 3557.64g). The mathematical equation for it is also $$y^​±t∗⋅SEprediction​$$ where we will have to find the residual variance but we can just use the rcode to make it easier and quicker.
+
+- The data shows that a human has 62kg body weight and 1320 g brain weight, so technically 1320g isn't an unusual number since its falls within the intervals. However humans still will lie above the fitted regression line. 
+
+- Once we plug in our slope and intercept from summary table as well as the 62kg human body weight to the linear equation, we get a different answer. 
+
+
+
+$$
+Y = b_0 + b_1 \cdot \text{Body\_weight\_Kg}
+$$
+
+$$
+Y = b_0(465.88816) + b_1(0.07161) \cdot (62) = 463.13g 
+$$
+The observed human brain weight is 1320 g, which is substantially larger than predicted by the model. This calculation shows a typical mammal around the same body weight as a human is predicted to have a brain weight of 463.13g which is not the case for humans, which makes them an outlier in a sense.
+
+
+
+
+
+
+

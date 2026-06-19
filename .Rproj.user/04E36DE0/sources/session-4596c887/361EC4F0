@@ -1,27 +1,27 @@
 {
-    "id": "1805DDC5",
-    "path": "~/SDS Projects/SDS291_Hadiya/case_study.qmd",
+    "id": "361EC4F0",
+    "path": "~/SDS Projects/SDS291_Hadiya/brain-body-weight-analysis/case_study.qmd",
     "project_path": null,
     "type": "quarto_markdown",
     "hash": "0",
     "contents": "",
-    "dirty": true,
-    "created": 1781848432261.0,
+    "dirty": false,
+    "created": 1781851747052.0,
     "source_on_save": false,
     "relative_order": 1,
     "properties": {
         "rmdVisualMode": "false",
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "36,0",
-        "scrollLine": "27"
+        "cursorPosition": "14,0",
+        "scrollLine": "0"
     },
     "folds": "",
     "lastKnownWriteTime": 1781848445,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1781848666696,
+    "last_content_update": 1781848445,
     "read_only": false,
     "read_only_alternatives": []
 }
