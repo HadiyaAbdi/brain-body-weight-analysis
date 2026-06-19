@@ -29,4 +29,12 @@ This project investigates how mammalian body weight relates to brain weight usin
 R • tidyverse • ggplot2 • Linear Regression • Statistical Modeling
 
 ## Data:
-This analysis uses a publicly reported mammalian brain and body weight dataset compiled from published studies. The dataset is not redistributed in this repository. Please obtain the data from the original source or your course materials before running the analysis.
+
+This project uses the **Mammal Brain and Body Weight** dataset, which was obtained from a publicly available source provided for educational use. The dataset contains mammalian species, body weight (kg), and brain weight (g) measurements compiled from published research.
+
+Original source referenced in the analysis:
+
+* Tartarelli, G., & Bisconti, M. (2006). *Trajectories and Constraints in Brain Evolution in Primates and Cetaceans.*
+
+If you reuse this dataset, please cite the original authors where appropriate.
+
